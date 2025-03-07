@@ -431,11 +431,28 @@ from django.views.generic.list import ListView
 
 class ProductRegister(CreateView):
     model = Product
-    fields = "__all__"
-    success_url = "/"
+        # fields = "__all__"
+    fields = ["productid", "productname", "category", "description", "price", "images" ]
+    success_url = "/ProductList"
+
+    def form_valid(self, form):
+        form.instance.userid = self.request.user # set userid as the logged-in user
+        return super().form_valid(form)
+
 
 class ProductList(ListView):
     model = Product
     def get_queryset(self):
         user = self.request.user
-        return Product.objects.filter(userid = user)
+        return Product.objects.filter(userid = user) # Assuming "user" is a foreignkey
+
+class ProductDelete(DeleteView):
+    model = Product
+    success_url = '/ProductList'
+
+class ProductUpdate(UpdateView):
+    model = Product
+    template_name_suffix = "_update_form"
+    # fields = "__all__"
+    fields = ["productname", "category", "description", "price", "images"]
+    success_url = "/ProductList"
